@@ -11,8 +11,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-     # - name: test
-     #   run: make cp-env ci
+      - name: test
+        run: make cp-env ci
 
       - name: Login to DockerHub
         uses: docker/login-action@v2
