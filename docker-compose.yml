@@ -1,28 +1,35 @@
-version: "3.8"  # Используем актуальную версию
+version: "3.8"
 
 services:
-
   db:
     image: postgres:latest
-      restart: always
+    restart: always  # ← Исправлен отступ (было 4 пробела, нужно 2)
     environment:
       POSTGRES_DB: ${DATABASE_NAME}
       POSTGRES_USER: ${DATABASE_USERNAME}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    ports:
+      - "5432:5432"  # ← Добавлено для доступа к БД
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # ← Для сохранения данных
+
   app:
-      build:
-        context: .
-        dockerfile: Dockerfile.production
-      image: user99430e/fastify-app:latest
-      ports:
-        - "3000:8080"
-      environment:
-        DATABASE_HOST: ${DATABASE_HOST}
-        DATABASE_NAME: ${DATABASE_NAME}
-        DATABASE_USERNAME: ${DATABASE_USERNAME}
-        DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-        DATABASE_PORT: ${DATABASE_PORT}
-          depends_on:
-            - db
-      command: bash -c 'sleep 3 && npm test'
-      restart: unless-stopped  # Автоперезапуск при падении
+    build:
+      context: .
+      dockerfile: Dockerfile.production
+    image: user99430e/fastify-app:latest
+    ports:
+      - "3000:8080"
+    environment:
+      DATABASE_HOST: db  # ← Исправлено: указываем имя сервиса
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_USERNAME: ${DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DATABASE_PORT: "5432"  # ← Явное указание порта
+    depends_on:
+      - db  # ← Исправлен отступ (было 6 пробелов, нужно 4)
+    command: bash -c 'sleep 3 && npm test'
+    restart: unless-stopped
+
+volumes:
+  postgres_data:  # ← Объявление тома
