@@ -1,0 +1,14 @@
+version: "3.8"  # Используем актуальную версию
+
+services:
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile.production
+        image: user99430e/fastify-app:latest
+        ports:
+           - "3000:8080"
+        environment:
+              NODE_ENV: production
+        command: make setup  # Или "make dev", если у вас есть Makefile
+        restart: unless-stopped  # Автоперезапуск при падении
